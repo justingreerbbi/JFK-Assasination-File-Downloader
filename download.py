@@ -13,9 +13,9 @@ from urllib.parse import urljoin
 # The script will download the PDFs to the DOWNLOAD_DIR directory.
 ####
 urls = [
-    #["https://www.archives.gov/research/jfk/release-2024", 'datatable'],
-    #["https://www.archives.gov/research/jfk/release-2025", 'datatable'],
-    #["https://www.archives.gov/research/jfk/release-2021","datatable"],
+    ["https://www.archives.gov/research/jfk/release-2024", 'datatable'],
+    ["https://www.archives.gov/research/jfk/release-2025", 'datatable'],
+    ["https://www.archives.gov/research/jfk/release-2021","datatable"],
     ["https://www.archives.gov/research/jfk/release-2022" ,"paged", 265],
     ["https://www.archives.gov/research/jfk/release-2023", "paged", 53],
     ["https://www.archives.gov/research/jfk/release-2017-2018", "paged", 1092],
