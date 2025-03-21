@@ -1,5 +1,8 @@
 # JFK Assassination Files Download
 
+Head Up! You will need 10's of gigs of disk space to handle all the downloaded files. Be sure you have enough space before starting. I do have plans
+on adding in a feature to resume for any reason but for now this is the rough 10 minute project that works great!
+
 This is a python script that will download all the JFK Assassination Files from the National Archive database without having to download them
 individually.
 
