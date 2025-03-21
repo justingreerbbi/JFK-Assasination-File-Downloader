@@ -13,7 +13,6 @@ from urllib.parse import urljoin
 # The script will download the PDFs to the DOWNLOAD_DIR directory.
 ####
 urls = [
-    ["https://www.archives.gov/research/jfk/release-2024", 'datatable'],
     ["https://www.archives.gov/research/jfk/release-2025", 'datatable'],
     ["https://www.archives.gov/research/jfk/release-2021","datatable"],
     ["https://www.archives.gov/research/jfk/release-2022" ,"paged", 265],
