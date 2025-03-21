@@ -26,17 +26,16 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 ## Download the PDF file
 def download_pdf(pdf_url, filename):
-
+    filepath = os.path.join(DOWNLOAD_DIR, filename)
     # If the filename exists, do not overwrite it, instead create a new filename with a random suffix
-    filename = os.path.join(DOWNLOAD_DIR, filename)
-    if os.path.exists(filename):
+    if os.path.exists(filepath):
         base, ext = os.path.splitext(filename)
         filename = f"{base}_duplicate_{os.urandom(4).hex()}{ext}"
+        filepath = os.path.join(DOWNLOAD_DIR, filename)
 
     try:
         response = requests.get(pdf_url)
         response.raise_for_status()
-        filepath = os.path.join(DOWNLOAD_DIR, filename)
         with open(filepath, "wb") as f:
             f.write(response.content)
         print(f"Downloaded: {filename}")
@@ -60,39 +59,10 @@ def process_page(url):
                 page_url = f"{link}?page={i}"
                 process_paged(page_url)
 
-    sys.exit()
-    try:
-        print(f"\nProcessing: {url}")
-        response = requests.get(url)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, "html.parser")
-
-        # Find the datatable
-        table = soup.find("table", class_="datatable")
-        if not table:
-            print("No datatable found.")
-            return
-
-        rows = table.find_all("tr")
-        for row in rows[1:]:  # Skip header row
-            cells = row.find_all("td")
-            if len(cells) >= 2:
-                link_tag = cells[0].find("a", href=True)
-                if link_tag and ".pdf" in link_tag['href'].lower():
-                    pdf_url = urljoin(url, link_tag['href'])
-                    release_date = cells[1].get_text(strip=True)
-
-                    filename = os.path.basename(pdf_url)
-                    # Optionally add date to filename: f"{release_date}_{filename}"
-                    download_pdf(pdf_url, filename)
-                    print(f"Release Date: {release_date}")
-    except Exception as e:
-        print(f"Error processing {url}: {e}")
-
 # Function to process a page ith datatable structure
 def process_datatable(url):
     try:
-        print(f"\nProcessing: {url}")
+        print(f"\nProcessing Datatable: {url}")
         response = requests.get(url)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
@@ -110,19 +80,19 @@ def process_datatable(url):
                 link_tag = cells[0].find("a", href=True)
                 if link_tag and ".pdf" in link_tag['href'].lower():
                     pdf_url = urljoin(url, link_tag['href'])
-                    release_date = cells[1].get_text(strip=True)
+                    #release_date = cells[1].get_text(strip=True)
 
                     filename = os.path.basename(pdf_url)
                     # Optionally add date to filename: f"{release_date}_{filename}"
                     download_pdf(pdf_url, filename)
-                    print(f"Release Date: {release_date}")
+                    #print(f"Release Date: {release_date}")
     except Exception as e:
         print(f"Error processing {url}: {e}")
 
 # Function to process a page with paged structure
 def process_paged(url):
     try:
-        print(f"\nProcessing: {url}")
+        print(f"\nProcessing Paged: {url}")
         response = requests.get(url)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
