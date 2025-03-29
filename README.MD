@@ -49,3 +49,5 @@ Please make sure to update tests as appropriate.
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+https://www.archives.gov/research/jfk/release-2017-2018?page=699

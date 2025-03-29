@@ -3,6 +3,9 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
+# Set Development For Testing
+dev = True
+
 ####
 # URLs to process
 # Each URL is structured as an array. The first element is the URL to process, the second is the method of search, 
@@ -20,13 +23,52 @@ urls = [
     ["https://www.archives.gov/research/jfk/release-2017-2018", "paged", 1092],
 ]
 
+# Create a a log file to track the last ran url
+last_url_file = "last_url.txt"
+last_url = None
+last_page = None
+
+# If the log file exists, read the last ran URL, else create the file and write an empty string
+if os.path.exists(last_url_file):
+    with open(last_url_file, "r") as f:
+        last_url = f.read().strip()
+        if "page=" in last_url:
+            last_page = int(last_url.split("page=")[-1])
+else:
+    with open(last_url_file, "w") as f:
+        f.write("")
+
+# If there is a last run, start from the last grabbed link.
+if(last_url):
+    print(f"Previous run detected. Starting at the last url: {last_url}")
+
+    # Get the base URL so we can figure out which url in the urls array to start from
+    base_url = last_url.split("?")[0]
+    for i, url in enumerate(urls):
+        if base_url in url[0]:
+            urls = urls[i:]
+            break
+    
+    print(f"Base URL: {base_url}")
+    print(f"Last ran URL: {last_url}")
+    print(f"Last ran Page: {last_page}")
+
+#sys.exit()
+
 # Directory to save downloaded PDFs
 DOWNLOAD_DIR = "downloads"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 ## Download the PDF file
 def download_pdf(pdf_url, filename):
+
+    # Development mode, do not download the file but print the URL
+    if dev:
+        print(f"Downloading: {pdf_url}")
+        return;
+
     filepath = os.path.join(DOWNLOAD_DIR, filename)
+
     # If the filename exists, do not overwrite it, instead create a new filename with a random suffix
     if os.path.exists(filepath):
         base, ext = os.path.splitext(filename)
@@ -46,14 +88,24 @@ def download_pdf(pdf_url, filename):
 def process_page(url):
     link = url[0]
     method = url[1]
+
+    # Update the last ran URL
+    last_url = link
+    with open(last_url_file, "w") as f:
+        f.write(last_url)
+
     if method == "datatable":
         process_datatable(link)
+
     elif method == "paged":
         pages = url[2]
-        for i in range(1, pages + 1):
+        start_page = 1
+        if(last_page):
+            start_page = last_page
+        for i in range(start_page, pages + 1):
 
             # If it is the first page, the URL is the same as the link, else it is the link with the page number
-            if i ==1:
+            if i == 1:
                 page_url = link
             else:
                 page_url = f"{link}?page={i}"
@@ -93,6 +145,8 @@ def process_datatable(url):
 def process_paged(url):
     try:
         print(f"\nProcessing Paged: {url}")
+        with open(last_url_file, "w") as f:
+            f.write(url)
         response = requests.get(url)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
